@@ -1,5 +1,6 @@
 from hashlib import sha256
 import random
+import string
 
 #part a, b
 # check if sha's equal
@@ -45,6 +46,12 @@ def bit_combinations(m0):
                     out_string += char
                 print(out_string)
                 break
+
+
+def add_to_table():
+
+    pass
+
             
 def main():
     bits = 00000000

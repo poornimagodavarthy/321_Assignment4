@@ -2,6 +2,8 @@ from hashlib import sha256
 import random
 import string
 import time
+import matplotlib.pyplot as plt
+import csv
 
 #part a, b
 # check if sha's equal
@@ -42,17 +44,45 @@ def bit_combinations(m0, input_bits):
             return m1, attempts, end_time-start_time
         attempts +=1
  
-def add_to_table():
+def add_to_table(str1):
+    collision_times, num_attempts = [], []
+    sizes = list(range(8, 51, 2))
+    for size in sizes:
+        print(f"--size: {size}--")
+        (m1, attempts, total_time) = bit_combinations(str1, size)
+        collision_times.append(total_time)
+        num_attempts.append(attempts)
 
-    pass
+    with open('collisions.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Digest Size (bits)", "Collision Time (seconds)", "Attempts"])
+        for size, time, attempt in zip(sizes, collision_times, num_attempts):
+            writer.writerow([size, time, attempt])
 
-            
+    return sizes, collision_times, num_attempts
+
+def plot_graph(sizes, collision_times, attempts):
+    #collision time vs hash size
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(sizes, collision_times, marker='o', color='b')
+    plt.xlabel("Digest Size (bits)")
+    plt.ylabel("Collision Time (seconds)")
+    plt.title("Collision Time vs Digest Size")
+
+    plt.subplot(1, 2, 2)
+    plt.plot(sizes, attempts, marker='o', color='r')
+    plt.xlabel("Digest Size (bits)")
+    plt.ylabel("Number of Attempts")
+    plt.title("Attempts vs Digest Size")
+    plt.tight_layout()
+    plt.show()
+
+        
 def main():
-    bits = 00000000
-    str1 = "aleez"
-    (m1, attempts, total_time) = bit_combinations(str1, 8)
-    print(m1, attempts, total_time)
-    #hash(str1, 8)
+    str1 = "Aleeeeeez"
+    sizes, collision_times, attempts = add_to_table(str1)
+    plot_graph(sizes, collision_times, attempts)
 
 if __name__ == "__main__":
     main()

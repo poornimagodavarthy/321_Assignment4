@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import csv
 
 #part a, b
-# check if sha's equal
 def hash(str1, input):
     #convert to bytes
     str1_bytes = ''.join(format(ord(c), '08b') for c in str1)
@@ -23,33 +22,31 @@ def hash(str1, input):
     flipped_hash = sha256(flipped_str.encode()).hexdigest()[:input]
     print(flipped_hash) #print flipped hash
 
-# go thru all possible bit combinations
+def collisions(m0, input_bits):
+    hash_table = {}
+    hashed_m0 = sha256(m0.encode()).hexdigest()[:(input_bits // 4)] 
+    hash_table[hashed_m0] = m0
+    start_time, end_time = time.time(), time.time()
 
-#part c: find 2 distinct str m0, m1 that hash to same truncated hash
-# CHANGE to handle diff size bits later
-def collisions(bits, sha_m0, input_bits):
-    #hash and print to screen in hex format
-    sha_bits = sha256(bits.encode()).hexdigest()[:(input_bits // 4)]
-    return sha_bits == sha_m0
-
-def bit_combinations(m0, input_bits):
-    sha_m0 = sha256(m0.encode()).hexdigest()[:(input_bits // 4)] #modify later
-    start_time = time.time()
     attempts = 0
     while True:
         m1 = "".join(random.choices(string.ascii_letters + string.digits, k=len(m0)))
-        if collisions(m1, sha_m0, input_bits):
-            print("Collision: ", "m0: ", m0, "m1: ", m1, "hash: ", sha_m0)
+        hashed_m1 = sha256(m1.encode()).hexdigest()[:(input_bits // 4)]
+        if hashed_m1 in hash_table:
             end_time = time.time()
-            return m1, attempts, end_time-start_time
+            print("Collision: ", "m0: ", m0, "m1: ", m1, "hash: ", hashed_m0)
+            break
+        hash_table[hashed_m1] = m1
         attempts +=1
+    return m1, attempts, end_time-start_time
+        
  
 def add_to_table(str1):
     collision_times, num_attempts = [], []
     sizes = list(range(8, 51, 2))
     for size in sizes:
         print(f"--size: {size}--")
-        (m1, attempts, total_time) = bit_combinations(str1, size)
+        (m1, attempts, total_time) = collisions(str1, size)
         collision_times.append(total_time)
         num_attempts.append(attempts)
 

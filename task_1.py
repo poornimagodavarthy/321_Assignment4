@@ -5,20 +5,21 @@ import string
 #part a, b
 # check if sha's equal
 def hash(str1, input):
+    #convert to bytes
     str1_bytes = ''.join(format(ord(c), '08b') for c in str1)
-    print(str1_bytes.encode())
+    print(sha256(str1.encode()).hexdigest()[:input]) # unflipped hash
+    #flip bits
     flipped = list(str1_bytes)
-    
     index = random.randint(0, len(flipped)-1)
     flipped[index] = '1' if flipped[index] == '0' else '0'
-    bytes = "".join(flipped)
-    print(bytes.encode())
-    str1 = str(flipped)
+    binary_string = "".join(flipped)
+    #convert back to str
+    flipped_chars = [chr(int(binary_string[i:i+8], 2)) for i in range(0, len(flipped), 8)]
+    flipped_str = "".join(flipped_chars)
     #hash and print to screen in hex format
-    str1_hash = sha256(str1.encode()).digest()
+    flipped_hash = sha256(flipped_str.encode()).hexdigest()[:input]
+    print(flipped_hash) #print flipped hash
 
-    str1_bit = str1_hash[:input]
-    print(str1_bit)
 # go thru all possible bit combinations
 
 #part c
@@ -55,10 +56,10 @@ def add_to_table():
             
 def main():
     bits = 00000000
-    str1 = "a"
-    output = bit_combinations(str1)
-    print(output)
-    #hash(str1, 8)
-    
+    str1 = "turtle"
+    #output = bit_combinations(str1)
+    #print(output)
+    hash(str1, 8)
+
 if __name__ == "__main__":
     main()

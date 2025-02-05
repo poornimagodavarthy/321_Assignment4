@@ -1,6 +1,7 @@
 from hashlib import sha256
 import random
 import string
+import time
 
 #part a, b
 # check if sha's equal
@@ -22,33 +23,25 @@ def hash(str1, input):
 
 # go thru all possible bit combinations
 
-#part c
-def collisions(bits, sha_m0):
+#part c: find 2 distinct str m0, m1 that hash to same truncated hash
+# CHANGE to handle diff size bits later
+def collisions(bits, sha_m0, input_bits):
     #hash and print to screen in hex format
-    sha_bits = sha256(bits.encode()).digest()[0]
+    sha_bits = sha256(bits.encode()).hexdigest()[:(input_bits // 4)]
     return sha_bits == sha_m0
 
-def bit_combinations(m0):
-    sha_m0 = sha256(m0.encode()).digest()[0] #modify later
-    m0_binary = ''.join(format(ord(c), '08b') for c in m0)
-    m0_int = int(m0_binary, 2)
-    out_string = ""
-    for i in range(256):
-        if m0_int != i:
-            bits = format(i, '08b')
-            output = collisions(bits, sha_m0)
-            if output == True:
-                #binary str, then string
-                bin_str = format(i, '08b')
-                mod = len(bin_str) % 8
-                for y in range(mod, len(bin_str), 8):
-                    integer = int(y)
-                    char = chr(integer)
-                    out_string += char
-                print(out_string)
-                break
-
-
+def bit_combinations(m0, input_bits):
+    sha_m0 = sha256(m0.encode()).hexdigest()[:(input_bits // 4)] #modify later
+    start_time = time.time()
+    attempts = 0
+    while True:
+        m1 = "".join(random.choices(string.ascii_letters + string.digits, k=len(m0)))
+        if collisions(m1, sha_m0, input_bits):
+            print("Collision: ", "m0: ", m0, "m1: ", m1, "hash: ", sha_m0)
+            end_time = time.time()
+            return m1, attempts, end_time-start_time
+        attempts +=1
+ 
 def add_to_table():
 
     pass
@@ -56,10 +49,10 @@ def add_to_table():
             
 def main():
     bits = 00000000
-    str1 = "turtle"
-    #output = bit_combinations(str1)
-    #print(output)
-    hash(str1, 8)
+    str1 = "aleez"
+    (m1, attempts, total_time) = bit_combinations(str1, 8)
+    print(m1, attempts, total_time)
+    #hash(str1, 8)
 
 if __name__ == "__main__":
     main()
